@@ -4,6 +4,12 @@
 cp example.local.env .env
 ```
 
+## Create network
+
+```shell
+docker network create --driver=overlay traefik
+```
+
 ## Create stack
 
 ```shell

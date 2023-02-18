@@ -6,14 +6,20 @@ services:
     image: traefik:${TRAEFIK_VERSION}
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certificates:/certificates
     command:
       - --providers.docker
       - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik`)
       - --providers.docker.exposedbydefault=false
       - --providers.docker.swarmmode
       - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --certificatesresolvers.le.acme.email=${TRAEFIK_CERTIFICATE_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/certificates/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
       - --accesslog
       - --log
       - --api
@@ -27,10 +33,23 @@ services:
         - traefik.constraint-label=traefik
         - traefik.docker.network=traefik
         - traefik.enable=true
-        - traefik.http.routers.traefik.entrypoints=http
-        - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
-        - traefik.http.routers.traefik.service=api@internal
         - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+
+        # Router: HTTP
+        - traefik.http.routers.traefik-http.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
+        - traefik.http.routers.traefik-http.entrypoints=http
+        - traefik.http.routers.traefik-http.middlewares=https-redirect
+
+        # Router: HTTPS
+        - traefik.http.routers.traefik-https.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
+        - traefik.http.routers.traefik-https.entrypoints=https
+        - traefik.http.routers.traefik-https.tls=true
+        - traefik.http.routers.traefik-https.tls.certresolver=le
+        - traefik.http.routers.traefik-https.service=api@internal
+
     networks:
       - traefik
 
@@ -47,9 +66,21 @@ services:
         - traefik.constraint-label=traefik
         - traefik.docker.network=traefik
         - traefik.enable=true
-        - traefik.http.routers.portainer_http.entrypoints=http
-        - traefik.http.routers.portainer_http.rule=Host(`${PORTAINER_HOST}`)
         - traefik.http.services.portainer.loadbalancer.server.port=9000
+
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+
+        # Router: HTTP
+        - traefik.http.routers.portainer-http.rule=Host(`${PORTAINER_HOST}`)
+        - traefik.http.routers.portainer-http.entrypoints=http
+        - traefik.http.routers.portainer-http.middlewares=https-redirect
+
+        # Router: HTTPS
+        - traefik.http.routers.portainer-https.rule=Host(`${PORTAINER_HOST}`)
+        - traefik.http.routers.portainer-https.entrypoints=https
+        - traefik.http.routers.portainer-https.tls=true
+        - traefik.http.routers.portainer-https.tls.certresolver=le
       mode: replicated
       replicas: 1
       placement:
@@ -75,3 +106,4 @@ networks:
 
 volumes:
   portainer_data:
+  traefik_certificates:

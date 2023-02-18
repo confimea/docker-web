@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  proxy:
+  traefik:
     image: traefik:${TRAEFIK_VERSION}
     ports:
       - ${TRAEFIK_PORT}:80
@@ -18,9 +18,9 @@ services:
       - --log
       - --api
     networks:
-      - proxy
+      - traefik
 
-  dashboard:
+  traefik_dashboard:
     image: traefik:${TRAEFIK_VERSION}
     deploy:
       labels:
@@ -32,8 +32,8 @@ services:
         - traefik.http.routers.traefik.service=api@internal
         - traefik.http.services.traefik.loadbalancer.server.port=8080
     networks:
-      - proxy
+      - traefik
 
 networks:
-  proxy:
+  traefik:
     attachable: true

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  proxy:
+  traefik:
     image: traefik:${TRAEFIK_VERSION}
     ports:
       - "80:80"
@@ -18,9 +18,9 @@ services:
       - --log
       - --api
     networks:
-      - proxy
+      - traefik
 
-  dashboard:
+  traefik_dashboard:
     image: traefik:${TRAEFIK_VERSION}
     deploy:
       labels:
@@ -28,12 +28,12 @@ services:
         - traefik.docker.network=traefik
         - traefik.enable=true
         - traefik.http.routers.traefik.entrypoints=http
-        - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)
+        - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
         - traefik.http.routers.traefik.service=api@internal
         - traefik.http.services.traefik.loadbalancer.server.port=8080
     networks:
-      - proxy
+      - traefik
 
 networks:
-  proxy:
+  traefik:
     attachable: true

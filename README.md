@@ -15,10 +15,4 @@ cd /srv/web
 cd swarm
 ```
 
-#### Local
-
-[swarm/README.local.md](swarm/README.local.md)
-
-#### Remote
-
-[swarm/README.remote.md](swarm/README.remote.md)
+[swarm/README.md](swarm/README.md)

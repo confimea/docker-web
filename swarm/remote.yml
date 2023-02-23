@@ -72,7 +72,6 @@ services:
 
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
-        - traefik.http.middlewares.web-portainer-auth.basicauth.users=root:${PORTAINER_HASHED_PASSWORD}
 
         # Router: HTTP
         - traefik.http.routers.portainer-http.rule=Host(`${PORTAINER_HOST}`)
@@ -84,7 +83,6 @@ services:
         - traefik.http.routers.portainer-https.entrypoints=https
         - traefik.http.routers.portainer-https.tls=true
         - traefik.http.routers.portainer-https.tls.certresolver=le
-        - traefik.http.routers.portainer-https.middlewares=web-portainer-auth
       mode: replicated
       replicas: 1
       placement:

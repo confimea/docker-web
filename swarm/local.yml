@@ -35,7 +35,7 @@ services:
       - traefik
 
   portainer:
-    image: portainer/portainer-ce:${PORTAINER_VERSION}
+    image: portainer/portainer-ee:${PORTAINER_VERSION}
     command: -H tcp://tasks.portainer_agent:9001 --tlsskipverify
     volumes:
       - portainer_data:/data

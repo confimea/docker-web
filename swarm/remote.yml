@@ -108,7 +108,7 @@ services:
     entrypoint: [ "sh", "-c" ]
     command: >
       "while true; do
-        if [ $(date +%H) = '00' ]; then
+        if [ $$(date +%H) = '00' ]; then
           docker image prune -af;
         fi;
         sleep 3600;
